@@ -9,7 +9,7 @@ from wordcloud import STOPWORDS, WordCloud
 
 
 # QA: assetのgroup_nameとは
-@asset(group_name="hackernews", compute_kind="HAckerNewsAPI")
+@asset(group_name="hackernews", compute_kind="HackerNewsAPI")
 def hackernews_topstory_ids() -> List[int]:
     """
     Got up to 500 top stories from the HackerNews topstories endpoint.
