@@ -3,4 +3,4 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.dagster]
-module_name = "datster-tutorial.datster_tutorial"
+module_name = "datster_tutorial"

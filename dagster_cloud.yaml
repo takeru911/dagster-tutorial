@@ -2,3 +2,6 @@ locations:
   - location_name: dagster_tutorial
     code_source:
       package_name: datster-tutorial.datster_tutorial
+  - location_name: dagster_tutorial_clone
+    code_source:
+      package_name: dagster-tutorial-clone.datster_tutorial
