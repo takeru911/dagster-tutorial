@@ -1,0 +1,4 @@
+locations:
+  - location_name: dagster_tutorial
+    code_source:
+      package_name: datster-tutorial.datster_tutorial
