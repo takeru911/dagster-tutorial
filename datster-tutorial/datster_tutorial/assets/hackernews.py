@@ -9,7 +9,7 @@ from wordcloud import STOPWORDS, WordCloud
 
 
 # QA: assetのgroup_nameとは
-@asset(group_name="hackernews", copute_kind="HAckerNewsAPI")
+@asset(group_name="hackernews", compute_kind="HAckerNewsAPI")
 def hackernews_topstory_ids() -> List[int]:
     """
     Got up to 500 top stories from the HackerNews topstories endpoint.
@@ -49,7 +49,7 @@ def hackernews_topstories(
 
 @asset(group_name="hackernews", compute_kind="Plot")
 def hackernews_topstories_word_cloud(
-    context: OpExecutionContext, hackernews_topstries: pd.DataFrame
+    context: OpExecutionContext, hackernews_topstories: pd.DataFrame
 ) -> bytes:
     """Exploratory analysis: Generate a word cloud from the current top 500 HackerNews top stories.
     Embed the plot into a Markdown metadata for quick view.
