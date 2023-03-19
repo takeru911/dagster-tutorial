@@ -1,4 +1,4 @@
-from dagster import Definitions, ScheduleDefinition, load_assets_from_packege_modules, define_asset_job
+from dagster import Definitions, ScheduleDefinition, define_asset_job, load_assets_from_package_module
 
 from . import assets
 
@@ -10,5 +10,5 @@ daily_refresh_schedule = ScheduleDefinition(
 )
 
 defs = Definitions(
-    assets=load_assets_from_packege_modules(assets), schedules=[daily_refresh_schedule]
+    assets=load_assets_from_package_module(assets), schedules=[daily_refresh_schedule]
 )
