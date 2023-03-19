@@ -10,7 +10,7 @@ from wordcloud import STOPWORDS, WordCloud
 
 # QA: assetのgroup_nameとは
 @asset(group_name="hackernews", compute_kind="HackerNewsAPI")
-def hackernews_topstory_ids() -> List[int]:
+def hackernews_topstory_ids_clone() -> List[int]:
     """
     Got up to 500 top stories from the HackerNews topstories endpoint.
     API Docs:  https://github.com/HackerNews/API#new-top-and-best-stories
@@ -23,8 +23,8 @@ def hackernews_topstory_ids() -> List[int]:
 
 # QA: contextとは
 @asset(group_name="hackernews", compute_kind="HackerNews API")
-def hackernews_topstories(
-    context: OpExecutionContext, hackernews_topstory_ids: List[int]
+def hackernews_topstories_clone(
+    context: OpExecutionContext, hackernews_topstory_ids_clone: List[int]
 ) -> pd.DataFrame:
     """
     Get items based on story ids from the HackerNews items endpoint. It may take 1-2 minutes to fetch all 500 items.
@@ -48,8 +48,8 @@ def hackernews_topstories(
     return df
 
 @asset(group_name="hackernews", compute_kind="Plot")
-def hackernews_topstories_word_cloud(
-    context: OpExecutionContext, hackernews_topstories: pd.DataFrame
+def hackernews_topstories_word_cloud_clone(
+    context: OpExecutionContext, hackernews_topstories_clone: pd.DataFrame
 ) -> bytes:
     """Exploratory analysis: Generate a word cloud from the current top 500 HackerNews top stories.
     Embed the plot into a Markdown metadata for quick view.
