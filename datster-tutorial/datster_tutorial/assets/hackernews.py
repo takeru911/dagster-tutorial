@@ -3,10 +3,11 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
-from dagster import asset, OpExecutionContext, MetadataValue
+from dagster import SourceAsset, asset, OpExecutionContext, MetadataValue, AssetKey
 from typing import List
 from wordcloud import STOPWORDS, WordCloud
 
+test_dataframe = SourceAsset(key=AssetKey("depended_initial"))
 
 # QA: assetのgroup_nameとは
 @asset(group_name="hackernews", compute_kind="HackerNewsAPI")
@@ -46,6 +47,15 @@ def hackernews_topstories(
     )
 
     return df
+
+@asset(group_name="hackernews", compute_kind="HackerNews API")
+def hackernews_with_dataframe(context: OpExecutionContext, hackernews_topstories: pd.DataFrame, depended_initial: pd.DataFrame):
+    context.add_output_metadata(
+        {
+            "depended_data": MetadataValue.md(depended_initial.to_markdown())
+        }
+    )
+
 
 @asset(group_name="hackernews", compute_kind="Plot")
 def hackernews_topstories_word_cloud(

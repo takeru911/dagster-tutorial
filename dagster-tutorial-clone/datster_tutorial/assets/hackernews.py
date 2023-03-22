@@ -3,13 +3,16 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
-from dagster import asset, OpExecutionContext, MetadataValue
+from dagster import AssetIn, asset, OpExecutionContext, MetadataValue
 from typing import List
 from wordcloud import STOPWORDS, WordCloud
 
 
 # QA: assetのgroup_nameとは
-@asset(group_name="hackernews", compute_kind="HackerNewsAPI")
+@asset(
+        group_name="hackernews", 
+        compute_kind="HackerNewsAPI"
+)
 def hackernews_topstory_ids_clone() -> List[int]:
     """
     Got up to 500 top stories from the HackerNews topstories endpoint.
@@ -22,16 +25,20 @@ def hackernews_topstory_ids_clone() -> List[int]:
     return top_500_newstries
 
 # QA: contextとは
-@asset(group_name="hackernews", compute_kind="HackerNews API")
+@asset(
+        group_name="hackernews", 
+        compute_kind="HackerNews API",
+        
+)
 def hackernews_topstories_clone(
     context: OpExecutionContext, hackernews_topstory_ids_clone: List[int]
 ) -> pd.DataFrame:
     """
     Get items based on story ids from the HackerNews items endpoint. It may take 1-2 minutes to fetch all 500 items.
     API Docs: https://github.com/HackerNews/API#items
-    """
+    """    
     results = []
-    for item_id in hackernews_topstory_ids:
+    for item_id in upstream:
         item = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{item_id}.json").json()
         results.append(item)
         if len(results) % 20 == 0:
@@ -57,7 +64,7 @@ def hackernews_topstories_word_cloud_clone(
     """
     stopwords = set(STOPWORDS)
     stopwords.update(["Ask", "Show", "HN"])
-    titles_text = " ".join([str(item) for item in hackernews_topstories["title"]])
+    titles_text = " ".join([str(item) for item in hackernews_topstories_clone["title"]])
     titles_cloud = WordCloud(stopwords=stopwords, background_color="white").generate(titles_text)
 
     # Generate the cloud image
