@@ -42,13 +42,13 @@ def hackernews_topstories(
     context.add_output_metadata(
         {
             "num_records": len(df),
-            "preview": MetadataValue.md(df.head().to_markdown()),
+            "preview": MetadataValue.md(df.head().to_markdown()),            
         }
     )
 
     return df
 
-@asset(group_name="hackernews", compute_kind="HackerNews API")
+@asset(group_name="hackernews", compute_kind="HackerNews API", op_tags={"test": "tag_value", "hoge": "huga"})
 def hackernews_with_dataframe(context: OpExecutionContext, hackernews_topstories: pd.DataFrame, depended_initial: pd.DataFrame):
     context.add_output_metadata(
         {

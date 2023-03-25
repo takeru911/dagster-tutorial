@@ -1,17 +1,55 @@
 import pandas as pd
-from dagster import AssetIn, MetadataValue, OpExecutionContext, asset
+from dagster import AssetIn, AssetOut, MetadataValue, OpExecutionContext, Output, asset, multi_asset, op, graph_asset, AssetMaterialization
+
+
+@op
+def test_op(initial_processing: pd.DataFrame) -> str:
+    return f"opのtestだよ.{initial_processing.shape}"
+
+@op
+def test_op2(test_op: str) -> str:    
+    return test_op + "ほんとうかね？"
 
 
 @asset(
     group_name="dataframe",
-    compute_kind="Pandas"
 )
 def initial_processing() -> pd.DataFrame:
-    tmp = [1,2,3,4,5]
-
+    tmp = [1,2,3,4,5]  
+    
     return pd.DataFrame(
         tmp, columns=["tmp"]
     )
+
+
+@multi_asset(
+    outs={
+        "multi_a": AssetOut(is_required=False),
+        "multi_b": AssetOut(is_required=False),
+    },
+    can_subset=True,
+    group_name="dataframe",
+    compute_kind="native"
+)
+def multi_asset(context):
+    if "multi_a" in context.selected_output_names:
+        yield Output(value=123, output_name="multi_a")
+    if "multi_b" in context.selected_output_names:
+        yield Output(value=456, output_name="multi_b")
+
+@asset(
+    group_name="dataframe",
+    compute_kind="native",
+)
+def using_multiasset(multi_b):
+    return multi_b
+
+@graph_asset(
+    group_name="dataframe",
+     
+)
+def init(initial_processing) -> pd.DataFrame:
+    return test_op2(test_op(initial_processing))
 
 @asset(
     group_name="dataframe",
@@ -51,6 +89,6 @@ def depended_initial_with_ins(context: OpExecutionContext, upstream):
     context.add_output_metadata(
         {
             "data_name": "upstream",
-            "content": upstream
+            "content": MetadataValue(upstream)
         }
     )
