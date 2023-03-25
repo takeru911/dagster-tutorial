@@ -3,15 +3,17 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
-from dagster import SourceAsset, asset, OpExecutionContext, MetadataValue, AssetKey
+from dagster import AssetIn, asset, OpExecutionContext, MetadataValue
 from typing import List
 from wordcloud import STOPWORDS, WordCloud
 
-test_dataframe = SourceAsset(key=AssetKey("depended_initial"))
 
 # QA: assetのgroup_nameとは
-@asset(group_name="hackernews", compute_kind="HackerNewsAPI")
-def hackernews_topstory_ids() -> List[int]:
+@asset(
+        group_name="hackernews", 
+        compute_kind="HackerNewsAPI"
+)
+def hackernews_topstory_ids_clone() -> List[int]:
     """
     Got up to 500 top stories from the HackerNews topstories endpoint.
     API Docs:  https://github.com/HackerNews/API#new-top-and-best-stories
@@ -23,16 +25,20 @@ def hackernews_topstory_ids() -> List[int]:
     return top_500_newstries
 
 # QA: contextとは
-@asset(group_name="hackernews", compute_kind="HackerNews API")
-def hackernews_topstories(
-    context: OpExecutionContext, hackernews_topstory_ids: List[int]
+@asset(
+        group_name="hackernews", 
+        compute_kind="HackerNews API",
+        
+)
+def hackernews_topstories_clone(
+    context: OpExecutionContext, hackernews_topstory_ids_clone: List[int]
 ) -> pd.DataFrame:
     """
     Get items based on story ids from the HackerNews items endpoint. It may take 1-2 minutes to fetch all 500 items.
     API Docs: https://github.com/HackerNews/API#items
-    """
+    """    
     results = []
-    for item_id in hackernews_topstory_ids:
+    for item_id in upstream:
         item = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{item_id}.json").json()
         results.append(item)
         if len(results) % 20 == 0:
@@ -42,24 +48,15 @@ def hackernews_topstories(
     context.add_output_metadata(
         {
             "num_records": len(df),
-            "preview": MetadataValue.md(df.head().to_markdown()),            
+            "preview": MetadataValue.md(df.head().to_markdown()),
         }
     )
 
     return df
 
-@asset(group_name="hackernews", compute_kind="HackerNews API", op_tags={"test": "tag_value", "hoge": "huga"})
-def hackernews_with_dataframe(context: OpExecutionContext, hackernews_topstories: pd.DataFrame, depended_initial: pd.DataFrame):
-    context.add_output_metadata(
-        {
-            "depended_data": MetadataValue.md(depended_initial.to_markdown())
-        }
-    )
-
-
 @asset(group_name="hackernews", compute_kind="Plot")
-def hackernews_topstories_word_cloud(
-    context: OpExecutionContext, hackernews_topstories: pd.DataFrame
+def hackernews_topstories_word_cloud_clone(
+    context: OpExecutionContext, hackernews_topstories_clone: pd.DataFrame
 ) -> bytes:
     """Exploratory analysis: Generate a word cloud from the current top 500 HackerNews top stories.
     Embed the plot into a Markdown metadata for quick view.
@@ -67,7 +64,7 @@ def hackernews_topstories_word_cloud(
     """
     stopwords = set(STOPWORDS)
     stopwords.update(["Ask", "Show", "HN"])
-    titles_text = " ".join([str(item) for item in hackernews_topstories["title"]])
+    titles_text = " ".join([str(item) for item in hackernews_topstories_clone["title"]])
     titles_cloud = WordCloud(stopwords=stopwords, background_color="white").generate(titles_text)
 
     # Generate the cloud image
