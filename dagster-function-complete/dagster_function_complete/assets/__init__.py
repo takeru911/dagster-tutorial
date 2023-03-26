@@ -1,0 +1,1 @@
+from dagster_function_complete.assets import basic

@@ -68,6 +68,7 @@ def initial_processing_2() -> pd.DataFrame:
 )
 def depended_initial(context: OpExecutionContext, initial_processing: pd.DataFrame, initial_processing_2: pd.DataFrame) -> pd.DataFrame:
     context.log.info("depend_initial")
+    
     data = pd.concat([initial_processing, initial_processing_2], axis=1)
     context.add_output_metadata(
         {

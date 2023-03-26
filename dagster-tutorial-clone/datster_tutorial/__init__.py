@@ -1,6 +1,5 @@
 import os
-import resource
-from dagster import AssetSelection, Definitions, JobDefinition, ScheduleDefinition, define_asset_job, load_assets_from_package_module, load_assets_from_modules
+from dagster import AssetSelection, Definitions, JobDefinition, ScheduleDefinition, define_asset_job, load_assets_from_package_module, load_assets_from_modules, resource
 
 from . import assets
 
@@ -26,7 +25,6 @@ job =  define_asset_job(
 )
 
 class TestResource:
-
     def __init__(self, shared_name: str, shared_value: str, env_value: str):
         self.shared_name = shared_name
         self.shared_value = shared_value
@@ -37,11 +35,11 @@ class TestResource:
         config_schema={"shared_name": str, "shared_value": str, "env_value": str}
 )
 def test_resource(context):
-    return TestResource(
-        context.resource_config["shared_name"],
-        context.resource_config["shared_value"],
-        context.resource_config["env_value"],
-    )
+    return {
+        "shared_name": context.resource_config["shared_name"],
+        "shared_value": context.resource_config["shared_value"],
+        "env_value": context.resource_config["env_value"],
+    }
 
 # Definitions
 ## asse
@@ -50,7 +48,7 @@ defs = Definitions(
     jobs=[job, all_asset_job_clone],
     schedules=[daily_refresh_schedule],
     resources={
-        test_resource: test_resource.configured(
+        "test_resource": test_resource.configured(
             {"shared_name": "MAEHARA", "shared_value": "911", "env_value": {"env": "TEST_ENV"}}
         )
     }
