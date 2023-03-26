@@ -1,5 +1,5 @@
 from dagster import build_op_context
-from dagster_function_complete.assets import asset_testing
+from ....dagster_function_complete.dagster_function_complete.assets import asset_testing
 
 # testの実行はpytestを使う
 

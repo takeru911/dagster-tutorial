@@ -1,9 +1,9 @@
 from typing import List
-from dagster import AssetIn, AssetKey, asset
+from dagster import AssetIn, AssetKey, SourceAsset, asset
 
 
 @asset(
-    key_prefix="same_group"        
+    key_prefix="same_group"    
 )
 def upstream_asset() -> List[int]:
     return [1, 3, 5]
