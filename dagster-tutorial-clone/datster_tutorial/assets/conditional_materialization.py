@@ -1,5 +1,6 @@
 import random
 import pandas as pd
+from typing import List
 from dagster import AssetIn, MetadataValue, OpExecutionContext, Output, asset
 
 @asset(
@@ -29,7 +30,7 @@ def may_not_materialize(context: OpExecutionContext) -> Output:
     group_name="conditional_testing",
     compute_kind="native function",
 )
-def depend_only_may_not_materialize(context: OpExecutionContext ,may_not_materialize: Output) -> list[int]:
+def depend_only_may_not_materialize(context: OpExecutionContext ,may_not_materialize: Output) -> List[int]:
     context.log.info("executed")
     context.add_output_metadata(metadata={
             "value": MetadataValue.md(str(may_not_materialize))
