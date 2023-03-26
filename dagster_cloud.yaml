@@ -5,3 +5,6 @@ locations:
   - location_name: dagster_tutorial_clone
     code_source:
       package_name: dagster-tutorial-clone.datster_tutorial
+  - location_name: dagster_function_complete
+    code_source:
+      package_name: dagster_function_complete.dagster_function_complete
